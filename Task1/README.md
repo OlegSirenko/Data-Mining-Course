@@ -1,4 +1,4 @@
-### Задача 1
+### Задача 1. Основы работы Python, matplotlib, NumPy 
 [Task1](Task1) состоит из нескольких файлов. 
 Исполняемые начинаются с слова test_. Т.е. 
 * [test_write_txt](Task1/test_write_txt.py)
