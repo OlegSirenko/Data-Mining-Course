@@ -3,7 +3,7 @@ from scipy import linalg
 import matplotlib.pyplot as plt
 
 # создаем исходные данные
-X = np.random.randn(100, 8)
+X = np.loadtxt("Data/data4.txt", delimiter="\t")
 
 # центрируем данные (вычитаем среднее значение)
 X_centered = X - np.mean(X, axis=0)
@@ -24,7 +24,7 @@ projected_2 = X_centered.dot(second_pc)
 
 # выводим результат на одном графике
 plt.axhline(y=0, color='r', linestyle='--')
-plt.scatter(projected_1, projected_2, alpha=0.5)
+plt.scatter(projected_1, projected_2, alpha=0.67)
 plt.xlabel('PC1')
 plt.ylabel('PC2')
 plt.title('PCA Projection')
