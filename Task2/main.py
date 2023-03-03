@@ -110,8 +110,9 @@ print(chi2[3], chi2[4], chi2[7])
 
 r = {3: (y - y_rel) / sigma, 4: (y - y_weil) / sigma, 7: (y - y_gamma) / sigma}
 
-plt.plot(x, r[3], label="Остатки функции 3")
-plt.plot(x, r[4], label="Остатки функции 4")
+# plt.plot(x, r[3], label="Остатки функции 3")
+# plt.plot(x, r[4], label="Остатки функции 4")
+plt.axhline(y=0.0, color='r', linestyle='--')
 plt.plot(x, r[7], label="Остатки функции 7")
 plt.xlabel("x")
 plt.ylabel("r")
@@ -122,8 +123,10 @@ N = int(len(y) / 2)
 k = np.arange(start=0, stop=N)
 
 AC = {3: autocorrelation(r[3], N, len(y)), 4: autocorrelation(r[4], N, len(y)), 7: autocorrelation(r[7], N, len(y))}
-plt.plot(k, AC[3], label="Автокорелляция для 3")
-plt.plot(k, AC[4], label="Автокорелляция для 4")
+# plt.plot(k, AC[3], label="Автокорелляция для 3")
+# plt.plot(k, AC[4], label="Автокорелляция для 4")
+
+plt.axhline(y=0.0, color='r', linestyle='--')
 plt.plot(k, AC[7], label="Автокорелляция для 7")
 plt.legend()
 plt.xlabel("k")
