@@ -5,11 +5,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-# TODO: ### **For task 2**
-#  - [] Make 4)
-#  - [] Make 5)
-
-
 def dover_int(t1, t2, C, q):
     b = len(q)
     ci_form = np.zeros((2, 2))
@@ -73,21 +68,21 @@ plt.title("y(x)")
 # НЕЛИНЕЙНЫЙ МЕТОД НАИМЕНЬШИХ
 # Функция 7
 params_gamma, cov_3, infodict, mesg, ier = curve_fit(f=gamma_raspred, xdata=x, ydata=y, bounds=(0, 3), full_output=True)
-print(params_gamma)
+print("Параметры для функции 7: \n", params_gamma)
 y_gamma = gamma_raspred(x, *params_gamma)
 plt.plot(x, gamma_raspred(x, *params_gamma), 'r-', label='Гамма-распределение')
 plt.legend()
 
 # Функция 4
 params_weilbull, cov_4 = curve_fit(f=weibull_raspred, xdata=x, ydata=y, bounds=(0, 3))
-print(params_weilbull)
+#print(params_weilbull)
 y_weil = weibull_raspred(x, *params_weilbull)
 plt.plot(x, weibull_raspred(x, *params_weilbull), 'g-', label='Распределение Вейбулла')
 plt.legend()
 
 # Функция 3
 params_reley, cov_7 = curve_fit(f=reley_raspred, xdata=x, ydata=y, bounds=(2, 5))
-print(params_reley)
+#print(params_reley)
 y_rel = reley_raspred(x, *params_reley)
 plt.plot(x, reley_raspred(x, *params_reley), 'y-', label='Распределение Реллея')
 plt.legend()
@@ -99,16 +94,17 @@ for i in range(len(y)):
     chi2[3] += ((y_rel[i] - y[i]) / sigma[i]) ** 2
     chi2[4] += ((y_weil[i] - y[i]) / sigma[i]) ** 2
     chi2[7] += ((y_gamma[i] - y[i]) / sigma[i]) ** 2
+#print("Chi^2: ")
+#print(chi2[3], chi2[4], chi2[7])
 
-print(chi2[3], chi2[4], chi2[7])
-
-chi2[3] = chi2[3] / 200
-chi2[4] = chi2[4] / 200
-chi2[7] = chi2[7] / 200
-
+chi2[3] = chi2[3] / (200 - 1 - 1)
+chi2[4] = chi2[4] / (200 - 2 - 1)
+chi2[7] = chi2[7] / (200 - 2 - 1)
+print("Chi^2 нормированное: ")
 print(chi2[3], chi2[4], chi2[7])
 
 r = {3: (y - y_rel) / sigma, 4: (y - y_weil) / sigma, 7: (y - y_gamma) / sigma}
+print()
 
 # plt.plot(x, r[3], label="Остатки функции 3")
 # plt.plot(x, r[4], label="Остатки функции 4")

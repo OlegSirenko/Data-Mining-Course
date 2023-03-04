@@ -1,64 +1,81 @@
-from scipy.stats.distributions import chi2
 import numpy as np
-from numpy import linalg as la
+from scipy import linalg
 import matplotlib.pyplot as plt
+from scipy.stats.distributions import chi2
+
+
+def check_on_sum(x, mat_cov):
+    sum_priznaki = np.sum(np.var(mat_cov, axis=0)).round(4)  # SUM_X
+    sum_proekts = np.sum(np.var(x, axis=0)).round(4)
+    if sum_priznaki == sum_proekts:
+        print("Проверка на суммы пройденна")
+    else:
+        print("Проверка на суммы не пройдена")
+
+
+def check_on_unit_matrix(cor_matrix, k, n):
+    x_kv = chi2.ppf(0.95, k * (k - 1) / 2)
+    d = 0
+    for i in range(k):
+        for j in range((i + 1), k):
+            d = d + cor_matrix[i, j] ** 2
+    d = d * n
+    if d > x_kv:
+        print("Корреляционная матрица значимо отличается от единичной матрицы.")
+    else:
+        print("Корреляционная матрица значимо отличается от единичной матрицы.")
 
 
 if __name__ == "__main__":
-    data = np.loadtxt("Data/data4.txt", delimiter="\t")
-    X = data  # получили матрицу 100 на 8
+    # создаем исходные данные
+    X = np.loadtxt("Data/data4.txt", delimiter="\t")
 
-    N = X.shape[0]  # 100
-    K = X.shape[1]  # 8
+    # центрируем данные (вычитаем среднее значение) + нормировка данных
+    X_centered = (X - np.mean(X, axis=0)) / np.std(X, axis=0)
 
-    mat = np.mean(X, axis=1)  # получили матожидание столбцов
-    sigma = np.std(X, axis=1)  # получили среднеквадратичное отклонение столбцов
+    # вычисляем ковариационную матрицу
+    cov_matrix = np.cov(X_centered.T)
+    print(cov_matrix.shape)
+    N = cov_matrix.shape[0]
+    K = cov_matrix.shape[1]
+    check_on_unit_matrix(cov_matrix, N, K)
 
-    print(N, K, mat.shape, sigma.shape)
+    # вычисляем собственные значения и собственные векторы
+    eigen_values, eigen_vectors = linalg.eig(cov_matrix)  # eigen_vectors = A, eigen_values = Lambda
 
-    X_std = np.zeros(X.shape)  # инициализация стандартизированной матрицы, 100 на 8
+    # projecting the original data on the eigenvectors space
+    Z = np.asmatrix(X_centered)*eigen_vectors
+    check_on_sum(X_centered, Z)
 
-    for i in range(0, N):
-        for j in range(0, K):
-            X_std[i][j] = (X[i][j] - mat[j]) / sigma[j]
+    proekts = np.var(Z, axis=0)
+    sum_proects = np.sum(proekts)
 
-    X_std = np.matrix(X_std)  # стандартизированная матрица
+    gamma = np.zeros(N)
+    alpha = np.zeros(N)
+    gamma[0] = proekts[0, 0]/sum_proects
 
-    R = (X_std.transpose() * X_std) / (N - 1)  # (8, 100) * (100,8) = (8, 8) матрица ковариации
+    for i in range(N):
+        alpha[i] = proekts[0, i]/sum_proects
 
-    d = 0
-    for i in range(K):
-        for j in range((i + 1), K):
-            d = d + R[i, j] ** 2
-    d = d * N
+    for j in range(1, N):
+        gamma[j] = gamma[j-1]+alpha[j]
 
-    x_kv = chi2.ppf(0.95, K * (K - 1) / 2)
-    print("Проверка на Хи^2 пройдена:", d > x_kv)
+    print("Вектор Альфа: \n", np.round(alpha, decimals=4))
+    print("Вектор Гамма: \n", np.round(gamma, decimals=4))
 
-    L, A = la.eig(R)  # L -- Собственные значения, каждое из которых повторяется в соответствии со своей кратностью
-    A = np.fliplr(A)  # A -- Нормализованный левый собственный вектор, соответствующий собственному значению
-    L = np.flip(L)
 
-    Z = X_std * A
-    print(Z.shape)
-    sum_priznaki = np.sum(np.var(X_std, axis=0))  # SUM_X
-    sum_proekts = np.sum(np.var(Z, axis=0))
+    # выбираем первые две главные компоненты
+    first_pc = eigen_vectors[:, -1]
+    second_pc = eigen_vectors[:, -2]
 
-    print("Проверка сумм: ", sum_priznaki == sum_proekts)
+    # проектируем данные на первые две компоненты
+    projected_1 = X_centered.dot(first_pc)
+    projected_2 = X_centered.dot(second_pc)
 
-    otn_d_rasbr = np.var(Z, axis=0) / sum_proekts  # относительна€ долю разброса, приход€ща€с€ на главные компоненты
-    print(otn_d_rasbr)
-    otn_d_rasbr_1_2 = otn_d_rasbr[:, 0] + otn_d_rasbr[:, 1]
-    print(otn_d_rasbr_1_2)
-
-    covariance = np.cov(Z)
-
-    print(np.ndarray.flatten(Z[:, 1]))
-
-    plt.axhline(y=0.0, color='r', linestyle='--')
-
-    plt.scatter(covariance[:, 0], covariance[:, 1])
-    plt.xlabel("Z[0]")
-    plt.ylabel("Z[1]")
-    plt.title("Диаграмма рассеяния для первых 2-х компонент")
+    # выводим результат на одном графике
+    plt.scatter(projected_1, projected_2, alpha=0.67)
+    plt.xlabel('Первая главная компонента')
+    plt.ylabel('Вторая главная компонента')
+    plt.grid()
+    plt.title('PCA Projection')
     plt.show()
