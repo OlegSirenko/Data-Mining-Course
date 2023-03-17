@@ -23,7 +23,7 @@ def check_on_unit_matrix(cor_matrix, k, n):
     if d > x_kv:
         print("Корреляционная матрица значимо отличается от единичной матрицы.")
     else:
-        print("Корреляционная матрица значимо отличается от единичной матрицы.")
+        print("Корреляционная матрица yt значимо отличается от единичной матрицы.")
 
 
 if __name__ == "__main__":
@@ -45,6 +45,8 @@ if __name__ == "__main__":
 
     # projecting the original data on the eigenvectors space
     Z = np.asmatrix(X_centered)*eigen_vectors
+    # Сумма выборочных дисперсий исходных признаков равна сумме выборочных дисперсий
+    # проекций объектов на главные компоненты
     check_on_sum(X_centered, Z)
 
     proekts = np.var(Z, axis=0)
@@ -79,3 +81,5 @@ if __name__ == "__main__":
     plt.grid()
     plt.title('PCA Projection')
     plt.show()
+
+
