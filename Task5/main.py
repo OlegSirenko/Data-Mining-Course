@@ -16,8 +16,6 @@ fig, axs = plt.subplots(1, 2, figsize=(8, 8), sharex=True, layout='constrained',
 # Create scatter plot for original data
 axs[0].scatter(x, y, s=35)
 axs[0].set_title("Экспериментальные данные")
-axs[0].set_xlabel('X2')
-axs[0].set_ylabel('X1')
 
 # Define initial values for k and C matrix
 k = 2
@@ -38,7 +36,7 @@ while True:
     R = np.zeros(k)
     for i in range(N):
         for n in range(k):
-            R[n] = pdist([X[i,:], C[n,:]], 'euclidean')
+            R[n] = pdist([X[i, :], C[n, :]], 'euclidean')
         n = np.argmin(R)
         U[i, 0] = n
         U[i, 1] = R[n]
@@ -48,7 +46,7 @@ while True:
     QQ = 0
     for p in range(k):
         # Define Objects as all datapoints in the current cluster
-        Obj = np.where(U[:,0] == p)[0]
+        Obj = np.where(U[:, 0] == p)[0]
         s = Obj.size
         # Initialize singl_clust and add euclidean distances to it for each point in current cluster
         singl_clust = np.zeros(s)
@@ -79,14 +77,16 @@ while True:
         Q_pred = QQ
         m += 1
 
+# Define custom colormap
+my_cmap = plt.colormaps['Set1']
+
+
 # Create scatter plot with each cluster represented by different color
-axs[1].scatter(x, y, c=U[:,0], cmap='tab10', s=15)
+axs[1].scatter(x, y, c=U[:, 0], cmap=my_cmap, s=15)
 axs[1].set_title('Найденные кластеры и их центры')
-# axs[1].set_xlabel('X2')
-# axs[1].set_ylabel('X1')
 
 # Define t values for plotting ovals
-t = np.arange(0, 2*np.pi, np.pi / 180)
+t = np.arange(0, 2 * np.pi, np.pi / 180)
 # For each cluster, plot an oval
 for i in range(k):
     # Define x and y coordinates for oval using cluster radius and center coordinates
@@ -97,5 +97,6 @@ for i in range(k):
 # Plot cluster centers as filled circles
 axs[1].scatter(C[:, 0], C[:, 1], c='k', s=20, marker='o')
 # Display both subplots
-
+fig.supxlabel('X2')
+fig.supylabel('X1')
 plt.show()
