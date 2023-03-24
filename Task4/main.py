@@ -18,9 +18,9 @@ plt.title("Входные данные")
 plt.show()
 
 # Евклидово
-# Расстояние
+# метрики
 d_eucl = pdist(X, 'euclidean')
-# Метрики
+# методы
 link_eucl_single = linkage(d_eucl, "single")
 link_eucl_averag = linkage(d_eucl, 'average')
 link_eucl_median = linkage(d_eucl, 'median')
@@ -75,8 +75,6 @@ clust = fcluster(link_eucl_averag, N_clust, 'maxclust')
 plt.figure()
 plt.scatter(x, y, c=clust)
 #plt.show()
-
-
 
 clust_centr = np.zeros((N_clust, K))  # матрица x и y координат центров
 # расстояния между центрами кластеров
