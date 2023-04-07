@@ -4,40 +4,40 @@ from scipy.spatial.distance import cdist
 import matplotlib.pyplot as plt
 from scipy.linalg import norm
 
-matplotlib.pyplot.close()
-
 # open file for read
 X = np.loadtxt('Data/data4.txt')
 
-# display data
-plt.scatter(X[:, 0], X[:, 1])
-plt.title('data')
-plt.xlabel('X2')
-plt.ylabel('X1')
-plt.show()
-
 N, K = X.shape
-m = 2
-k = 1
-k_max = 40000
+m = 2  # кол-во нейронов
+k = 1  # кол-во итераций
+k_max = 10000000  # максимальное кол-во итераций
 
 # init W
-W = np.zeros((m, K))
-for i in range(m):
-    W[i, :] = X[i, :]
+# W = np.zeros((m, K))
+# for i in range(m):
+#     W[i, :] = X[i, :]
+
+W = np.random.rand(m, X.shape[1])
 
 # next iteration
 new_W = W.copy()
 # matrix for classification
 U = np.zeros((N, 2))
 # study parameters
-h = 0.01
-eps = 1e-8
+h = 0.25
+eps = 1e-6
+
+plt.scatter(X[:, 0], X[:, 1])
+plt.scatter(W[:, 0], W[:, 1], c='r', s=120, marker='x')
+plt.title('data')
+plt.xlabel('X1')
+plt.ylabel('X2')
+plt.show()
 
 kMin = np.ceil(np.log(eps / (norm(X, 'fro') ** 2)) / np.log(1 - h))
 print("Рассчетное kMin", kMin)
 
-while k < kMin:
+while k < k_max:
     index = np.random.randint(0, N)
     d = cdist(X[index, :].reshape(1, -1), W)
 
@@ -63,6 +63,6 @@ for i in range(N):
 plt.scatter(X[:, 0], X[:, 1], c=U[:, 0])
 plt.scatter(W[:, 0], W[:, 1], c='r', s=120, marker='x')
 plt.title('clusters and neurons')
-plt.xlabel('X2')
-plt.ylabel('X1')
+plt.xlabel('X1')
+plt.ylabel('X2')
 plt.show()
