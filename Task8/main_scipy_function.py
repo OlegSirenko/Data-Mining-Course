@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.optimize import basinhopping
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib
@@ -13,6 +14,11 @@ def F(X):
     return (x ** 2 + y ** 2) / A - B * (np.cos(x) + np.cos(y))
 
 
+def constraint(X):
+    x, y = X
+    return np.array([-8 - x, x - 8, -8 - y, y - 8])
+
+
 def stochastic_search(N, a, b):
     X = a + (b - a) * np.random.rand(N, 2)
     F_values = [F(x) for x in X]
@@ -21,31 +27,13 @@ def stochastic_search(N, a, b):
     return X_min, F_min
 
 
-def simulated_annealing(F, x0, bounds, T=50.0, T0=0.001, v=0.99):
-    X = x0
-    l = 0
-    while T > T0:
-        l += 1
-        z = np.random.normal(size=len(X))
-        X_new = X + z * T
-        for i in range(len(X)):
-            if X_new[i] < bounds[i][0]:
-                X_new[i] = bounds[i][0]
-            elif X_new[i] > bounds[i][1]:
-                X_new[i] = bounds[i][1]
-        dE = F(X_new) - F(X)
-        if dE < 0:
-            X = X_new
-        else:
-            P = np.exp(-dE / T)
-            if np.random.uniform() < P:
-                X = X_new
-            else:
-                T = v * T
-    return X
+def simulated_annealing(F, x0):
+    cons = ({'type': 'ineq', 'fun': constraint})
+    res = basinhopping(F, x0, niter=10, T=1.0, stepsize=0.5, minimizer_kwargs={"constraints": cons})
+    return res.x
 
 
-N = 1000
+N = 200
 a = np.array([-8, -8])
 b = np.array([8, 8])
 X_min_stochastic_search, F_min_stochastic_search = stochastic_search(N, a, b)
@@ -53,8 +41,7 @@ print(f"Минимальное значение F (stochastic search): {F_min_st
 print(f"X_min (stochastic search): {X_min_stochastic_search}")
 
 x0 = [0, 0]
-bounds = [(-8, 8), (-8, 8)]
-X_min_simulated_annealing = simulated_annealing(F, x0, bounds)
+X_min_simulated_annealing = simulated_annealing(F, x0)
 F_min_simulated_annealing = F(X_min_simulated_annealing)
 print(f"Минимальное значение F (simulated annealing): {F_min_simulated_annealing}")
 print(f"X_min (simulated annealing): {X_min_simulated_annealing}")
